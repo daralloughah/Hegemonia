@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0a111d">
+<title>Hégémonie</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="lib/d3-delaunay.min.js" as="script">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/echarts@4.9.0/map/js/world.js" as="script" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Saira+Condensed:wght@500;600;700&family=Big+Shoulders+Stencil+Display:wght@700;800&family=Cinzel:wght@600;700;800&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<canvas id="map" aria-label="Carte du monde"></canvas>
+<div id="loading"><div class="spbg"><div class="spsun"></div><div class="spjet" id="spjet"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="spg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfd8e3"/><stop offset="1" stop-color="#5d6b7d"/></linearGradient></defs><path transform="rotate(90 12 12)" fill="url(#spg)" d="M12 1.5l1.6 6.5 7.9 5.5v2.2l-7.9-2.2-.8 5.4 3.2 2.4v1.6L12 21.6l-4 1.3v-1.6l3.2-2.4-.8-5.4-7.9 2.2v-2.2l7.9-5.5z"/></svg></div></div>
+<div class="sptit"><h1>HÉGÉMONIE</h1><p>Guerre mondiale · An 2030</p></div>
+<div class="spfoot"><div class="spbar"><i id="spb"></i><span id="spt">0 %</span></div><p id="sptip"></p></div></div>
+
+<div id="hud" hidden>
+  <div id="lvl"><b id="lvB">Niv. 1</b><i><u id="lvX"></u></i></div>
+  <div id="res"></div>
+</div>
+<div id="clock" hidden><span id="hTime"></span><button id="spd" aria-label="Vitesse du temps">x1</button></div>
+<div id="modes" hidden>
+  <button data-m="pol" class="on" aria-label="Carte politique"><svg viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Pays</button>
+  <button data-m="ter" aria-label="Carte du terrain"><svg viewBox="0 0 24 24"><path d="M2 20l7-12 4 6 3-4 6 10z"/></svg>Terrain</button>
+  <button data-m="eco" aria-label="Carte économique"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.7 0-2.8 1-2.8 2.2 0 2.8 5.6 1.6 5.6 4.3 0 1.2-1.2 2.2-2.8 2.2-1.2 0-2.2-.6-2.7-1.6M12 6.5v11"/></svg>Éco</button>
+  <button data-m="mil" aria-label="Carte militaire"><svg viewBox="0 0 24 24"><path d="M4 4l10 10M14 14l-2 4 6-2M20 4L10 14M10 14l2 4-6-2"/></svg>Guerre</button>
+</div>
+<div id="welc" hidden></div>
+<div id="tip" hidden><p id="tipT"></p><button id="tipX" aria-label="Fermer l'aide">✕</button></div>
+
+<div id="sheet" hidden>
+  <div id="abar" hidden></div>
+  <button id="grab" aria-label="Fermer le panneau" hidden></button>
+  <div id="ctx" hidden></div>
+  <nav id="nav">
+    <button data-v="armees"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="11" rx="1"/><path d="M3 7l18 11M21 7L3 18"/></svg>Armées</button>
+    <button data-v="prod"><svg viewBox="0 0 24 24"><path d="M3 20V10l5 3V10l5 3V6l8 4v10z"/></svg>Produire</button>
+    <button data-v="rech"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg>Recherche</button>
+    <button data-v="alli"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></svg>Alliance</button>
+    <button data-v="plus"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>Plus</button>
+  </nav>
+</div>
+
+<div id="start" hidden>
+  <div class="box">
+    <h1>HÉGÉ<span>MONIE</span></h1>
+    <p>2030. Prends la tête d'une nation, déplace tes divisions sur la carte, conquiers province après province. Les autres pays sont joués par l'IA.</p>
+    <input id="search" placeholder="Rechercher un pays…" autocomplete="off">
+    <div id="picks"></div>
+    <div id="chosen">Touche un pays sur la carte ou dans la liste</div>
+    <button id="go" disabled>Prendre le pouvoir</button>
+  </div>
+</div>
+<div id="choice" hidden></div>
+<div id="city" hidden></div>
+<div id="card" hidden></div>
+<div id="toast"></div>
+<div id="lvup" hidden></div>
+<div id="end" hidden></div>
+<div id="ring" hidden></div><button id="hudT" hidden></button><div id="hud2" hidden></div><div id="lcol" hidden></div><div id="rcol" hidden></div>
+<div id="kp" hidden></div><div id="sit" hidden></div><div id="off" hidden></div><div id="pop" hidden></div><div id="rv" hidden></div><div id="ad" hidden></div>
+
+<script src="lib/d3-delaunay.min.js"></script>
+<script src="config.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

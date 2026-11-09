@@ -1,0 +1,49 @@
+name: Générer la carte du monde
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  carte:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les outils
+        run: pip install numpy pillow
+
+      - name: Télécharger Natural Earth II (relief, forêts, déserts, glaces)
+        run: |
+          mkdir -p /tmp/ne && cd /tmp/ne
+          for u in \
+            https://naciscdn.org/naturalearth/10m/raster/NE2_LR_LC_SR_W_DR.zip \
+            https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/raster/NE2_LR_LC_SR_W_DR.zip \
+            https://naciscdn.org/naturalearth/50m/raster/NE2_50M_SR_W.zip \
+            https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/raster/NE2_50M_SR_W.zip
+          do
+            echo "Essai : $u"
+            if curl -L --fail --retry 3 -A "Mozilla/5.0" -o ne.zip "$u" && unzip -o -q ne.zip; then
+              if ls *.tif >/dev/null 2>&1; then echo "OK"; break; fi
+            fi
+          done
+          ls -la
+          ls *.tif
+
+      - name: Découper en tuiles
+        run: python tools/make_tiles.py "$(ls /tmp/ne/*.tif | head -1)" map
+
+      - name: Enregistrer dans le dépôt
+        run: |
+          git config user.name "carte-bot"
+          git config user.email "carte-bot@users.noreply.github.com"
+          git add map
+          git commit -m "Carte : tuiles Natural Earth II" || echo "Rien de nouveau"
+          git push
