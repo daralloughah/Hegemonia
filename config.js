@@ -1,7 +1,5 @@
-// Hégémonie — réglages en ligne (Supabase)
-// Remplace les deux valeurs entre guillemets par celles de ton projet Supabase
-// (Project Settings → API) : le Project URL et la clé "anon public".
+// Hégémonia — réglages en ligne (Supabase)
 window.HEG_CFG = {
-  url: "COLLE_ICI_TON_PROJECT_URL",
-  key: "COLLE_ICI_TA_CLE_ANON_PUBLIC"
+  url: "https://mdwqkewcemdbkjarlxum.supabase.co",
+  key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kd3FrZXdjZW1kYmtqYXJseHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNzg0NjksImV4cCI6MjEwOTc1NDQ2OX0.LSeg0GYJ7YLibYOdi5T73Gz80cc_1qTGqT_AEzA8BqU"
 };
